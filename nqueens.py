@@ -12,6 +12,21 @@ class NQueensModel(object):
             self.solution_list.append(i)
         self.number_of_solutions = 1
 
+    def set_n(self, N):
+        self.N = N
+
+    def get_current_solution(self):
+        pass
+
+    def get_prev_solution(self):
+        pass
+
+    def get_next_solution(self):
+        pass
+
+    def get_number_of_solutions(self):
+        pass
+
 class NQueensView(urwid.WidgetWrap):
     palette = [
         ('empty_black', 'black', 'black'),
@@ -99,13 +114,13 @@ class NQueensView(urwid.WidgetWrap):
     def on_decrease_button(self, w):
         if self.N > 1:
             self.N -= 1
-            #self.controller.decrease_n()
+            self.controller.set_n(self.N)
             self.controls.body[0].set_text('Number of queens: ' + str(self.N))
             #self.board.decrease_n()
 
     def on_increase_button(self, w):
         self.N += 1
-        #self.controller.increase_n()
+        self.controller.set_n(self.N)
         self.controls.body[0].set_text('Number of queens: ' + str(self.N))
         #self.board.increase_n()
 
@@ -118,9 +133,29 @@ class NQueensView(urwid.WidgetWrap):
     def quit(self, w):
         raise urwid.ExitMainLoop()
 
+class NQueensController(object):
+    def __init__(self, N=4):
+        self.N = N
+        self.model = NQueensModel(self.N)
+        self.view = NQueensView(self, self.N)
+        self.loop = None
+
+    def set_n(self, N):
+        self.N = N
+        self.model.set_n(self.N)
+
+    def get_prev_solution(self):
+        pass
+
+    def get_next_solution(self):
+        pass
+
+    def main(self):
+        self.loop = urwid.MainLoop(self.view, self.view.palette)
+        self.loop.run()
+
 def main():
-    queens = NQueensView(None)
-    urwid.MainLoop(queens, queens.palette).run()
+    NQueensController().main()
 
 if __name__ == '__main__':
     main()
