@@ -35,3 +35,5 @@ or if you're on Mac OSX you can use macports or brew to install the urwid
 library. After you do so you can simply:
 
 $ python nqueens.py
+
+![Alt text](screenshot.png?raw=true "NQueens")
