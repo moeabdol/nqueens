@@ -116,12 +116,14 @@ class NQueensView(urwid.WidgetWrap):
             self.N -= 1
             self.controller.set_n(self.N)
             self.controls.body[0].set_text('Number of queens: ' + str(self.N))
+            self.controls.body[3].set_text('Number of solutions: 0')
             self.board.change_n(self.N)
 
     def on_increase_button(self, w):
         self.N += 1
         self.controller.set_n(self.N)
         self.controls.body[0].set_text('Number of queens: ' + str(self.N))
+        self.controls.body[3].set_text('Number of solutions: 0')
         self.board.change_n(self.N)
 
     def on_prev_button(self, w):
