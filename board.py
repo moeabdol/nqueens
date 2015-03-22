@@ -22,7 +22,7 @@ class Board(urwid.BoxAdapter):
         self.fill = urwid.Filler(self.pad, valign='top')
         super(Board, self).__init__(self.fill, height=self.N * 3)
 
-    def change_n(self, N):
+    def set_n(self, N):
         self.N = N
         cells = []
         for i in range(self.N):
@@ -40,3 +40,9 @@ class Board(urwid.BoxAdapter):
         self.grid.cells = cells
         self.pad.width = self.N * 6
         self.height = self.N * 3
+
+    def draw_solution(self, solution):
+        cells = self.grid.cells
+        for col, row in enumerate(solution):
+            cells[(row * self.N) + col].flip_to_queen_tile()
+        self.grid.cells = cells
