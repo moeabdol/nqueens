@@ -9,9 +9,14 @@ class NQueensModel(object):
         self.number_of_solutions = 0
 
     def solve(self):
+        self.solution_list = []
+        self.solution_index = None
+        self.number_of_solutions = 0
+        solution = []
         for i in range(self.N):
-            self.solution_list.append(i)
-        if self.solution_list:
+            solution.append(i)
+        if solution:
+            self.solution_list.append(solution)
             self.solution_index = 0
             self.number_of_solutions = 1
         else:
@@ -54,7 +59,7 @@ class NQueensView(urwid.WidgetWrap):
         ('screen_edge', 'light blue', 'dark blue'),
         ('main_shadow', 'dark gray', 'black'),
         ('line', 'black', 'light gray', 'standout'),
-        ('button', 'white', 'black', 'standout'),
+        ('button', 'white', 'dark blue', 'standout'),
     ]
 
     def __init__(self, controller, N=4):
@@ -125,35 +130,36 @@ class NQueensView(urwid.WidgetWrap):
         w = self.main_shadow(w)
         return w
 
-    def on_solve_button(self, w):
-        first_solution, number_of_solutions = self.controller.solve()
-        if first_solution is not None and number_of_solutions != 0:
-            pass
-
     def on_decrease_button(self, w):
         if self.N > 1:
             self.N -= 1
             self.controller.set_n(self.N)
             self.controls.body[0].set_text('Number of queens: ' + str(self.N))
             self.controls.body[3].set_text('Number of solutions: 0')
-            self.board.change_n(self.N)
+            self.board.set_n(self.N)
 
     def on_increase_button(self, w):
         self.N += 1
         self.controller.set_n(self.N)
         self.controls.body[0].set_text('Number of queens: ' + str(self.N))
         self.controls.body[3].set_text('Number of solutions: 0')
-        self.board.change_n(self.N)
+        self.board.set_n(self.N)
+
+    def on_solve_button(self, w):
+        first_solution, number_of_solutions = self.controller.solve()
+        if first_solution is not None and number_of_solutions != 0:
+            self.board.draw_solution(first_solution)
+            self.controls.body[3].set_text('Number of solutions: ' + str(number_of_solutions))
 
     def on_prev_button(self, w):
         prev_solution = self.controller.get_prev_solution()
         if prev_solution is not None:
-            pass
+            self.board.draw_solution(prev_solution)
 
     def on_next_button(self, w):
         next_solution = self.controller.get_next_solution()
         if next_solution is not None:
-            pass
+            self.board.draw_solution(next_solution)
 
     def quit(self, w):
         raise urwid.ExitMainLoop()
