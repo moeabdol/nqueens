@@ -1,4 +1,5 @@
 import board
+import itertools
 import urwid
 
 class NQueensModel(object):
@@ -12,16 +13,17 @@ class NQueensModel(object):
         self.solution_list = []
         self.solution_index = None
         self.number_of_solutions = 0
-        solution = []
-        for i in range(self.N):
-            solution.append(i)
-        if solution:
-            self.solution_list.append(solution)
+        for perm in itertools.permutations(range(self.N)):
+            diagonal1 = set()
+            diagonal2 = set()
+            for i in range(self.N):
+                diagonal1.add(perm[i] + i)  # test \ diagonal
+                diagonal2.add(perm[i] - i)  # test / diagonal
+            if self.N == len(diagonal1) == len(diagonal2):
+                self.solution_list.append(list(perm))
+                self.number_of_solutions += 1
+        if self.solution_list:
             self.solution_index = 0
-            self.number_of_solutions = 1
-        else:
-            self.solution_index = None
-            self.number_of_solutions = 0
 
     def set_n(self, N):
         self.N = N
@@ -33,14 +35,16 @@ class NQueensModel(object):
             return None
 
     def get_prev_solution(self):
-        if self.solution_index > 0:
+        if self.solution_index > 0 and \
+                self.solution_index is not None:
             self.solution_index -= 1
             return self.solution_list[self.solution_index]
         else:
             return None
 
     def get_next_solution(self):
-        if self.solution_index < self.number_of_solutions - 1:
+        if self.solution_index < self.number_of_solutions - 1 and \
+                self.solution_index is not None:
             self.solution_index += 1
             return self.solution_list[self.solution_index]
         else:
@@ -48,6 +52,9 @@ class NQueensModel(object):
 
     def get_number_of_solutions(self):
         return self.number_of_solutions
+
+    def get_solution_index(self):
+        return self.solution_index
 
 class NQueensView(urwid.WidgetWrap):
     palette = [
@@ -136,6 +143,7 @@ class NQueensView(urwid.WidgetWrap):
             self.controller.set_n(self.N)
             self.controls.body[0].set_text('Number of queens: ' + str(self.N))
             self.controls.body[3].set_text('Number of solutions: 0')
+            self.controls.body[6].set_text('Solution: 0')
             self.board.set_n(self.N)
 
     def on_increase_button(self, w):
@@ -143,6 +151,7 @@ class NQueensView(urwid.WidgetWrap):
         self.controller.set_n(self.N)
         self.controls.body[0].set_text('Number of queens: ' + str(self.N))
         self.controls.body[3].set_text('Number of solutions: 0')
+        self.controls.body[6].set_text('Solution: 0')
         self.board.set_n(self.N)
 
     def on_solve_button(self, w):
@@ -150,16 +159,21 @@ class NQueensView(urwid.WidgetWrap):
         if first_solution is not None and number_of_solutions != 0:
             self.board.draw_solution(first_solution)
             self.controls.body[3].set_text('Number of solutions: ' + str(number_of_solutions))
+            self.controls.body[6].set_text('Solution: 1')
+        else:
+            self.controls.body[6].set_text('Solution: 0')
 
     def on_prev_button(self, w):
-        prev_solution = self.controller.get_prev_solution()
+        prev_solution, solution_index = self.controller.get_prev_solution()
         if prev_solution is not None:
             self.board.draw_solution(prev_solution)
+            self.controls.body[6].set_text('Solution: ' + str(solution_index + 1))
 
     def on_next_button(self, w):
-        next_solution = self.controller.get_next_solution()
+        next_solution, solution_index = self.controller.get_next_solution()
         if next_solution is not None:
             self.board.draw_solution(next_solution)
+            self.controls.body[6].set_text('Solution: ' + str(solution_index + 1))
 
     def quit(self, w):
         raise urwid.ExitMainLoop()
@@ -180,10 +194,10 @@ class NQueensController(object):
         return self.model.get_current_solution(), self.model.get_number_of_solutions()
 
     def get_prev_solution(self):
-        return self.model.get_prev_solution()
+        return self.model.get_prev_solution(), self.model.get_solution_index()
 
     def get_next_solution(self):
-        return self.model.get_next_solution()
+        return self.model.get_next_solution(), self.model.get_solution_index()
 
     def main(self):
         self.loop = urwid.MainLoop(self.view, self.view.palette)

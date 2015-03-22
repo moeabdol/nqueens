@@ -42,6 +42,7 @@ class Board(urwid.BoxAdapter):
         self.height = self.N * 3
 
     def draw_solution(self, solution):
+        self.set_n(self.N)
         cells = self.grid.cells
         for col, row in enumerate(solution):
             cells[(row * self.N) + col].flip_to_queen_tile()
