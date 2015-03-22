@@ -21,3 +21,22 @@ class Board(urwid.BoxAdapter):
         self.pad = urwid.Padding(self.grid, width=self.N * 6)
         self.fill = urwid.Filler(self.pad, valign='top')
         super(Board, self).__init__(self.fill, height=self.N * 3)
+
+    def change_n(self, N):
+        self.N = N
+        cells = []
+        for i in range(self.N):
+            for j in range(self.N):
+                if i % 2 == 0:
+                    if j % 2 == 0:
+                        cells.append(tile.Tile(queen=False, color='white'))
+                    else:
+                        cells.append(tile.Tile(queen=False, color='black'))
+                else:
+                    if j % 2 == 0:
+                        cells.append(tile.Tile(queen=False, color='black'))
+                    else:
+                        cells.append(tile.Tile(queen=False, color='white'))
+        self.grid.cells = cells
+        self.pad.width = self.N * 6
+        self.height = self.N * 3
